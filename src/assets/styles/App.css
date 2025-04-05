@@ -1,0 +1,121 @@
+/* Custom styles */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+  }
+  
+  .sidebar {
+    background-color: #343a40;
+    min-height: 100vh;
+    transition: all 0.3s;
+    position: fixed;
+    z-index: 1000;
+  }
+  
+  .sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+    border-radius: 4px;
+    margin-bottom: 5px;
+    padding: 10px 15px;
+  }
+  
+  .sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  .sidebar .nav-link.active {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .main-content {
+    margin-left: 250px;
+    padding: 20px;
+    transition: all 0.3s;
+  }
+  
+  .table-responsive {
+    overflow-x: auto;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 992px) {
+    .sidebar {
+      width: 70px;
+      overflow: hidden;
+    }
+    .sidebar .nav-link span {
+      display: none;
+    }
+    .sidebar .nav-link i {
+      margin-right: 0;
+      font-size: 1.2rem;
+    }
+    .sidebar .sidebar-header h5 span {
+      display: none;
+    }
+    .main-content {
+      margin-left: 70px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 0;
+    }
+    .sidebar {
+      width: 0;
+      overflow: hidden;
+    }
+  }
+  
+  /* Card styles */
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  /* Badge styles */
+  .badge {
+    font-weight: 500;
+    padding: 5px 10px;
+  }
+  
+  /* Form styles */
+  .form-control, .form-select {
+    border-radius: 5px;
+    padding: 10px;
+  }
+  
+  /* Button styles */
+  .btn {
+    border-radius: 5px;
+    padding: 8px 16px;
+    font-weight: 500;
+  }
+  
+  /* Toast styles */
+  .Toastify__toast {
+    border-radius: 5px;
+    font-family: inherit;
+  }
+  
+  .Toastify__toast--success {
+    background-color: #28a745;
+  }
+  
+  .Toastify__toast--error {
+    background-color: #dc3545;
+  }
+  
+  .Toastify__toast--info {
+    background-color: #17a2b8;
+  }
+  
+  .Toastify__toast--warning {
+    background-color: #ffc107;
+    color: #212529;
+  }
