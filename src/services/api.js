@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 // const API_URL = 'https://raythu-admin.vercel.app';
-const API_URL = 'http://localhost:5000';
+const API_URL = 'https://raythu-admin.vercel.app';
 
 const api = axios.create({
   baseURL: API_URL,

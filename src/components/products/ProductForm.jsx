@@ -94,7 +94,7 @@ Object.entries(product).forEach(([key, value]) => {
 });
 
 try {
-  const res = await axios.post('http://localhost:5000/products', formData, {
+  const res = await axios.post('https://raythu-admin.vercel.app/products', formData, {
     headers: {
       'Content-Type': 'multipart/form-data'
     }
