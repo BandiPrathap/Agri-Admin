@@ -6,6 +6,7 @@ import Products from './pages/Products';
 import Categories from './pages/Categories';
 import Viruses from './pages/Viruses';
 import './assets/styles/App.css';
+import Cart from './utils/Cart';
 
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/viruses" element={<Viruses />} />
+        <Route path="/cart" element= {<Cart/>}/>
       </Routes>
     </Layout>
   );

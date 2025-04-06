@@ -75,54 +75,58 @@ const ProductForm = ({ categories = [], viruses = [], onSubmit, initialData }) =
     filterVirusesByCategory(categoryId);
   };
 
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-
+  
     try {
-      let imageUrl = initialData?.image_url || '';
-
-      // If new image file selected, upload to image server
-      // Append all product fields including imageUrl
-const formData = new FormData();
-Object.entries(product).forEach(([key, value]) => {
-  if (key === 'imageUrl' && value) {
-    formData.append('image', value); // must match `upload.single('image')` on server
-  } else {
-    formData.append(key, value);
-  }
-});
-
-try {
-  const res = await axios.post('https://raythu-admin.vercel.app/products', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-
-  alert('Product created successfully!');
-} catch (error) {
-  console.error('Error during form submission:', error);
-  alert('Submission failed.');
-}
-
-
-      // Append all product fields to formData
-      Object.entries(product).forEach(([key, value]) => {
-        if (key !== 'imageUrl') {
-          formData.append(key, value);
-        }
-      });
-
-      // Add image_url from upload or existing
-      formData.append('image_url', imageUrl);
-
-      onSubmit(formData);
+      if (initialData) {
+        const formData = new FormData();
+        Object.entries(product).forEach(([key, value]) => {
+          if (key === 'imageUrl' && value) {
+            formData.append('image', value);
+          } else {
+            formData.append(key, value);
+          }
+        });
+      
+        await axios.put(`https://raythu-admin.vercel.app/product/${initialData.id}`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+      
+        alert('Product updated successfully');
+      } else {
+        // For create — send with image
+        const formData = new FormData();
+        Object.entries(product).forEach(([key, value]) => {
+          if (key === 'imageUrl' && value) {
+            formData.append('image', value);
+          } else {
+            formData.append(key, value);
+          }
+        });
+  
+        await axios.post('https://raythu-admin.vercel.app/products', formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+  
+        alert('Product created successfully!');
+      }
+  
+      if (onSubmit) {
+        onSubmit();
+      }
     } catch (error) {
       console.error('Error during form submission:', error);
-      alert('Image upload or form submission failed.');
+      alert('Submission failed.');
     }
   };
+  
 
   return (
     <Form onSubmit={handleSubmit}>
