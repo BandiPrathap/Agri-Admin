@@ -2,7 +2,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 
 const API_URL = 'https://raythu-admin.vercel.app';
-// const API_URL = 'http://localhost:5000';;
+// const API_URL = 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: API_URL,
@@ -69,11 +69,20 @@ export default {
   getProductsByVirus(virusId) {
     return api.get(`/product/virus/${virusId}`);
   },
+  getProductViruses(productId){
+    return api.get(`/virus/product/${productId}`);
+  },
+  getProductCategories(productId){
+    return api.get(`/category/product/${productId}`);
+  },
   addProduct(product) {
     return api.post('/products', product);
   },
   updateProduct(id, product) {
     return api.put(`/product/${id}`, product);
+  },
+  updateStock(id,stock){
+    return api.put(`/product/stock/${id}`,stock);
   },
   deleteProduct(id) {
     return api.delete(`/product/${id}`);

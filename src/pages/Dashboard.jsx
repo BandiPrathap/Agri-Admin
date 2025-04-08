@@ -12,55 +12,55 @@ const Dashboard = () => {
     categories: 0,
     pendingOrders: 0
   });
-  const [products, setProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  // const [products, setProducts] = useState([]);
+  // const [categories, setCategories] = useState([]);
+  // const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  // useEffect(() => {
+  //   fetchDashboardData();
+  // }, []);
   
-  const fetchDashboardData = async () => {
-    try {
-      setLoading(true);
-      const [productsRes, categoriesRes, ordersRes] = await Promise.all([
-        api.getProducts(),
-        api.getCategories(),
-        api.getOrders()
-      ]);
+  // const fetchDashboardData = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const [productsRes, categoriesRes, ordersRes] = await Promise.all([
+  //       api.getProducts(),
+  //       api.getCategories(),
+  //       api.getOrders()
+  //     ]);
   
-      const pendingOrders = ordersRes.data.filter(order => order.status === 'pending').length;
+  //     const pendingOrders = ordersRes.data.filter(order => order.status === 'pending').length;
   
-      setProducts(productsRes.data);
-      setCategories(categoriesRes.data);
+  //     setProducts(productsRes.data);
+  //     setCategories(categoriesRes.data);
   
-      const updatedStats = {
-        products: productsRes.data.length,
-        orders: ordersRes.data.length,
-        categories: categoriesRes.data.length,
-        pendingOrders
-      };
+  //     const updatedStats = {
+  //       products: productsRes.data.length,
+  //       orders: ordersRes.data.length,
+  //       categories: categoriesRes.data.length,
+  //       pendingOrders
+  //     };
   
-      console.log('📊 Dashboard stats:', updatedStats);
+  //     console.log('📊 Dashboard stats:', updatedStats);
   
-      setStats(updatedStats);
-    } catch (error) {
-      toast.error('Failed to load dashboard data');
-    } finally {
-      setLoading(false);
-    }
-  };
+  //     setStats(updatedStats);
+  //   } catch (error) {
+  //     toast.error('Failed to load dashboard data');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
   
 
-  if (loading) {
-    return (
-      <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="d-flex justify-content-center align-items-center" style={{ height: '300px' }}>
+  //       <div className="spinner-border text-primary" role="status">
+  //         <span className="visually-hidden">Loading...</span>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div>
@@ -103,12 +103,12 @@ const Dashboard = () => {
           />
         </Col>
       </Row>
-
+{/* 
       <Row>
         <Col md={12}>
           <CategoryChart categories={categories} products={products} />
         </Col>
-      </Row>
+      </Row> */}
     </div>
   );
 };

@@ -7,53 +7,54 @@ const ProductForm = ({ categories = [], viruses = [], onSubmit, initialData }) =
     name_en: '',
     name_te: '',
     company: '',
-    category_id: '',
-    virus_id: '',
-    imageUrl: null, // holds the File object
+    category_id: [],
+    virus_id: [],
+    imageUrl: null,
     price: '',
     quantity: '',
     description: '',
-    type: 'Liquid' // default to 'Liquid'
+    type: 'Liquid',
   });
 
   const [categoryViruses, setCategoryViruses] = useState([]);
 
   useEffect(() => {
     if (initialData) {
+      // Safely handle category_id
+      const initialCategories = initialData.category_id || [];
+      const selectedCategoryIds = Array.isArray(initialCategories)
+        ? initialCategories
+        : [initialCategories];
+  
+      // Safely handle virus_id
+      const initialViruses = initialData.virus_id || [];
+      const selectedVirusIds = Array.isArray(initialViruses)
+        ? initialViruses
+        : [initialViruses];
+  
       setProduct({
         ...initialData,
+        category_id: selectedCategoryIds.filter(Boolean).map(String),
+        virus_id: selectedVirusIds.filter(Boolean).map(String),
         imageUrl: null,
-        type: initialData.type || 'Liquid' 
+        type: initialData.type || 'Liquid',
       });
-      filterVirusesByCategory(initialData.category_id, initialData.virus_id);
+      
+      filterVirusesByCategory(selectedCategoryIds.filter(Boolean).map(String));
     }
   }, [initialData]);
-
+  
   useEffect(() => {
-    if (categories.length > 0 && !initialData) {
-      const defaultCategoryId = categories[0].id.toString();
-      setProduct(prev => ({
-        ...prev,
-        category_id: defaultCategoryId
-      }));
-      filterVirusesByCategory(defaultCategoryId);
-    }
-  }, [categories, initialData]);
-
-  useEffect(() => {
-    if (product.category_id) {
+    if (product.category_id.length > 0) {
       filterVirusesByCategory(product.category_id);
+    } else {
+      setCategoryViruses([]);
     }
-  }, [viruses]);
+  }, [product.category_id, viruses]);
 
-  const filterVirusesByCategory = (categoryId, existingVirusId = '') => {
-    const filtered = viruses.filter(v => String(v.category_id) === String(categoryId));
+  const filterVirusesByCategory = (categoryIds) => {
+    const filtered = viruses.filter(v => categoryIds.includes(String(v.category_id)));
     setCategoryViruses(filtered);
-
-    setProduct(prev => ({
-      ...prev,
-      virus_id: existingVirusId || (filtered.length > 0 ? filtered[0].id.toString() : '')
-    }));
   };
 
   const handleChange = (e) => {
@@ -65,67 +66,79 @@ const ProductForm = ({ categories = [], viruses = [], onSubmit, initialData }) =
     setProduct(prev => ({ ...prev, imageUrl: e.target.files[0] }));
   };
 
-  const handleCategoryChange = (e) => {
-    const categoryId = e.target.value;
-    setProduct(prev => ({
-      ...prev,
-      category_id: categoryId,
-      virus_id: ''
-    }));
-    filterVirusesByCategory(categoryId);
+  const handleCategoryCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setProduct(prev => {
+      const updatedCategories = checked
+        ? [...prev.category_id, value]
+        : prev.category_id.filter(id => id !== value);
+      return {
+        ...prev,
+        category_id: updatedCategories,
+        virus_id: prev.virus_id.filter(vid => {
+          const virus = viruses.find(v => v.id.toString() === vid);
+          return virus && updatedCategories.includes(String(virus.category_id));
+        })
+      };
+    });
   };
 
-  
+  const handleVirusCheckboxChange = (e) => {
+    const { value, checked } = e.target;
+    setProduct(prev => {
+      const updatedViruses = checked
+        ? [...prev.virus_id, value]
+        : prev.virus_id.filter(id => id !== value);
+      return { ...prev, virus_id: updatedViruses };
+    });
+  };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
   
     try {
+      const formData = new FormData();
+  
+      formData.append("name_en", product.name_en);
+      formData.append("name_te", product.name_te);
+      formData.append("company", product.company);
+      formData.append("price", product.price);
+      formData.append("quantity", product.quantity);
+      formData.append("description", product.description);
+  
+      // Append multi-select fields
+      product.category_id.forEach((catId) => formData.append("category_id", catId));
+      product.virus_id.forEach((virusId) => formData.append("virus_id", virusId));
+  
+      // Append image for creation only
+      if (!initialData && product.imageUrl) {
+        formData.append("image", product.imageUrl);
+      }
+  
       if (initialData) {
-        const formData = new FormData();
-        Object.entries(product).forEach(([key, value]) => {
-          if (key === 'imageUrl' && value) {
-            formData.append('image', value);
-          } else {
-            formData.append(key, value);
-          }
-        });
-      
-        await axios.put(`https://raythu-admin.vercel.app/product/${initialData.id}`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-      
-        alert('Product updated successfully');
+        // For update — send JSON (no image handling)
+        const updatePayload = {
+          ...product,
+          imageUrl: undefined, // Just in case
+        };
+        await axios.put(`https://raythu-admin.vercel.app/product/${initialData.id}`, updatePayload);
+        alert("Product updated successfully!");
       } else {
-        // For create — send with image
-        const formData = new FormData();
-        Object.entries(product).forEach(([key, value]) => {
-          if (key === 'imageUrl' && value) {
-            formData.append('image', value);
-          } else {
-            formData.append(key, value);
-          }
+        // For add — use multipart/form-data
+        await axios.post("https://raythu-admin.vercel.app/product", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
         });
-  
-        await axios.post('https://raythu-admin.vercel.app/products', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-  
-        alert('Product created successfully!');
+        alert("Product added successfully!");
       }
   
-      if (onSubmit) {
-        onSubmit();
-      }
-    } catch (error) {
-      console.error('Error during form submission:', error);
-      alert('Submission failed.');
+      if (onSubmit) onSubmit();
+    } catch (err) {
+      console.error("Form submission error:", err);
+      alert("Something went wrong.");
     }
   };
+  
   
 
   return (
@@ -134,25 +147,13 @@ const ProductForm = ({ categories = [], viruses = [], onSubmit, initialData }) =
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Name (English)</Form.Label>
-            <Form.Control
-              type="text"
-              name="name_en"
-              value={product.name_en}
-              onChange={handleChange}
-              required
-            />
+            <Form.Control type="text" name="name_en" value={product.name_en} onChange={handleChange} required />
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Name (Telugu)</Form.Label>
-            <Form.Control
-              type="text"
-              name="name_te"
-              value={product.name_te}
-              onChange={handleChange}
-              required
-            />
+            <Form.Control type="text" name="name_te" value={product.name_te} onChange={handleChange} required />
           </Form.Group>
         </Col>
       </Row>
@@ -161,131 +162,77 @@ const ProductForm = ({ categories = [], viruses = [], onSubmit, initialData }) =
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Company</Form.Label>
-            <Form.Control
-              type="text"
-              name="company"
-              value={product.company}
-              onChange={handleChange}
-              required
-            />
+            <Form.Control type="text" name="company" value={product.company} onChange={handleChange} required />
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Image</Form.Label>
-            <Form.Control
-              type="file"
-              name="imageUrl"
-              onChange={handleFileChange}
-              accept="image/*"
-            />
-          </Form.Group>
-        </Col>
-      </Row>
-
-      <Row>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Select
-              name="category_id"
-              value={product.category_id}
-              onChange={handleCategoryChange}
-              required
-            >
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.name_en}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Target Virus</Form.Label>
-            <Form.Select
-              name="virus_id"
-              value={product.virus_id}
-              onChange={handleChange}
-              required
-              disabled={categoryViruses.length === 0}
-            >
-              <option value="">Select Virus</option>
-              {categoryViruses.map((virus) => (
-                <option key={virus.id} value={virus.id}>
-                  {virus.name_en}
-                </option>
-              ))}
-            </Form.Select>
+            <Form.Control type="file" name="imageUrl" onChange={handleFileChange} accept="image/*" />
           </Form.Group>
         </Col>
       </Row>
 
       <Form.Group className="mb-3">
-  <Form.Label>Type</Form.Label>
-  <div>
-    <Form.Check
-      inline
-      type="radio"
-      label="Liquid"
-      name="type"
-      value="Liquid"
-      checked={product.type === 'Liquid'}
-      onChange={handleChange}
-    />
-    <Form.Check
-      inline
-      type="radio"
-      label="Solid"
-      name="type"
-      value="Solid"
-      checked={product.type === 'Solid'}
-      onChange={handleChange}
-    />
-  </div>
-</Form.Group>
+        <Form.Label>Categories</Form.Label>
+        <div className='d-flex space-between'>
+          {categories.map(category => (
+            <Form.Check
+              key={category.id}
+              type="checkbox"
+              label={category.name_en}
+              value={category.id}
+              checked={product.category_id.includes(category.id.toString())}
+              onChange={handleCategoryCheckboxChange}
+              className='m-2'
+            />
+          ))}
+        </div>
+      </Form.Group>
 
+      <Form.Group className="mb-3">
+        <Form.Label>Target Viruses</Form.Label>
+        <div>
+          {categoryViruses.map(virus => (
+            <Form.Check
+              key={virus.id}
+              type="checkbox"
+              label={virus.name_en}
+              value={virus.id}
+              checked={product.virus_id.includes(virus.id.toString())}
+              onChange={handleVirusCheckboxChange}
+            />
+          ))}
+          {categoryViruses.length === 0 && <div className="text-muted">No viruses for selected category</div>}
+        </div>
+      </Form.Group>
+
+      <Form.Group className="mb-3">
+        <Form.Label>Type</Form.Label>
+        <div>
+          <Form.Check inline type="radio" label="Liquid" name="type" value="Liquid" checked={product.type === 'Liquid'} onChange={handleChange} />
+          <Form.Check inline type="radio" label="Solid" name="type" value="Solid" checked={product.type === 'Solid'} onChange={handleChange} />
+        </div>
+      </Form.Group>
 
       <Row>
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Price (₹)</Form.Label>
-            <Form.Control
-              type="number"
-              name="price"
-              value={product.price}
-              onChange={handleChange}
-              min="0"
-              step="0.01"
-              required
-            />
+            <Form.Control type="number" name="price" value={product.price} onChange={handleChange} min="0" step="0.01" required />
           </Form.Group>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Quantity</Form.Label>
-            <Form.Control
-              type="number"
-              name="quantity"
-              value={product.quantity}
-              onChange={handleChange}
-              min="0"
-              required
-            />
+            <Form.Control type="number" name="quantity" value={product.quantity} onChange={handleChange} min="0" required />
           </Form.Group>
         </Col>
       </Row>
 
       <Form.Group className="mb-3">
         <Form.Label>Description</Form.Label>
-        <Form.Control
-          as="textarea"
-          rows={3}
-          name="description"
-          value={product.description}
-          onChange={handleChange}
-        />
+        <Form.Control as="textarea" rows={3} name="description" value={product.description} onChange={handleChange} />
       </Form.Group>
 
       <div className="d-flex justify-content-end">
