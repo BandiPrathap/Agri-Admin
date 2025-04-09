@@ -136,20 +136,6 @@ const Products = () => {
     }
   };
 
-  const handleDeleteProduct = async (id) => {
-    if (window.confirm('Are you sure you want to delete this product?')) {
-      try {
-        await api.deleteProduct(id);
-        localStorage.removeItem("productDataCache"); 
-        fetchData();
-        toast.success('Product deleted successfully');
-      } catch (error) {
-        toast.error('Failed to delete product');
-      }
-    }
-  };
-
-
   const filteredProducts = products.filter(product => {
     const matchesSearch =
       product.name_en.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -249,7 +235,7 @@ const Products = () => {
       <Card className="mb-4 shadow-sm">
         <Card.Body>
           <Row className="gy-2">
-            <Col md={3}>
+            <Col md={4}>
               <Form.Control
                 type="text"
                 placeholder="🔍 Search by name..."
@@ -257,7 +243,7 @@ const Products = () => {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <Form.Select
                 value={filterCategory}
                 onChange={(e) => setFilterCategory(e.target.value)}
@@ -270,7 +256,7 @@ const Products = () => {
                 ))}
               </Form.Select>
             </Col>
-            <Col md={3}>
+            <Col md={4}>
               <Form.Select
                 value={filterVirus}
                 onChange={(e) => setFilterVirus(e.target.value)}
@@ -283,7 +269,7 @@ const Products = () => {
                 ))}
               </Form.Select>
             </Col>
-            <Col md={3}>
+            {/* <Col md={3}>
               <Form.Select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
@@ -292,7 +278,7 @@ const Products = () => {
                 <option value="Liquid">Liquid</option>
                 <option value="Solid">Solid</option>
               </Form.Select>
-            </Col>
+            </Col> */}
           </Row>
         </Card.Body>
       </Card>
@@ -339,26 +325,34 @@ const Products = () => {
                     </Badge>
                   </td>
                   <td>
+                     <div className='d-flex space-between align-items-center'>
                       ₹{product.price}{' '}
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => onUpdatePrice(product)}
-                      >
-                        <i className="fas fa-pen"></i>
-                      </Button>
+                        <Button
+                          variant="outline-primary"
+                          size="sm"
+                          onClick={() => onUpdatePrice(product)}
+                          style={{ border:"none"}}
+                          aria-label="Update Price"
+                        >
+                          <i className="fas fa-pen"></i>
+                        </Button>
+                     </div>
                   </td>
                   <td>
-                    <Badge bg={product.quantity > 0 ? 'success' : 'danger'}>
+                  <div className='d-flex space-between align-items-center'>
+                    <Badge bg={product.quantity > 0 ? 'success' : 'danger'} className='h-100'>
                       {product.quantity} in stock
                     </Badge>
                     <Button
-                      variant="outline-warning"
+                      variant="outline-primary"
                       size="sm"
                       onClick={() => onUpdateStock(product)}
+                      style={{ border:"none"}}
+                      aria-label="Update Stock"
                     >
-                      <i className="fas fa-box"></i>
+                      <i className="fas fa-pen"></i>
                     </Button>
+                    </div>
                   </td>
                   <td>
                     <div className="d-flex gap-2">

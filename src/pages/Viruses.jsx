@@ -146,7 +146,7 @@ const Viruses = () => {
           ) : (
             <div className="table-responsive">
               <Table hover bordered className="align-middle text-center">
-                <thead className="table-dark">
+                <thead>
                   <tr>
                     <th>ID</th>
                     <th>Name (English)</th>
@@ -166,7 +166,7 @@ const Viruses = () => {
                       </td>
                       <td>
                         <Button
-                          variant="warning"
+                          variant="outline-primary"
                           size="sm"
                           className="me-2"
                           onClick={() => { setSelectedVirus(virus); setShowModal(true); }}
@@ -174,7 +174,7 @@ const Viruses = () => {
                           <i className="fas fa-edit"></i>
                         </Button>
                         <Button
-                          variant="danger"
+                          variant="outline-danger"
                           size="sm"
                           onClick={() => { setSelectedVirus(virus); setShowConfirm(true); }}
                         >
@@ -192,7 +192,7 @@ const Viruses = () => {
 
       {/* Add/Edit Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg" centered>
-        <Modal.Header closeButton className="bg-primary text-white">
+        <Modal.Header closeButton className="text-dark">
           <Modal.Title>{selectedVirus ? 'Edit Virus' : 'Add New Virus'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>

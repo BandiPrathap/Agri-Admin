@@ -126,7 +126,7 @@ const Categories = () => {
               <td>{category.name_te}</td>
               <td>
                 <Button
-                  variant="warning"
+                  variant="outline-primary"
                   size="sm"
                   onClick={() => openEditModal(category)}
                   className="me-2"
@@ -134,7 +134,7 @@ const Categories = () => {
                   <i className="fas fa-edit"></i>
                 </Button>
                 <Button
-                  variant="danger"
+                  variant="outline-danger"
                   size="sm"
                   onClick={() => openDeleteModal(category)}
                 >
